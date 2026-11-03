@@ -1,0 +1,14 @@
+$ kubectl delete pod inventory-6dbd759cb7-lczrv --wait=false
+pod "inventory-6dbd759cb7-lczrv" deleted from default namespace
+
+$ kubectl get pods -l app=inventory -w   (stopped after 40s)
+NAME                         READY   STATUS              RESTARTS   AGE
+inventory-6dbd759cb7-lczrv   1/1     Terminating         0          99s
+inventory-6dbd759cb7-tlq4g   0/1     ContainerCreating   0          0s
+inventory-6dbd759cb7-wdvdf   1/1     Running             0          99s
+inventory-6dbd759cb7-lczrv   0/1     Completed           0          99s
+inventory-6dbd759cb7-lczrv   0/1     Completed           0          99s
+inventory-6dbd759cb7-lczrv   0/1     Completed           0          99s
+inventory-6dbd759cb7-tlq4g   0/1     Running             0          1s
+inventory-6dbd759cb7-tlq4g   1/1     Running             0          2s
+

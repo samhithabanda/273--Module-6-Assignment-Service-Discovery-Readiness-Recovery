@@ -1,0 +1,16 @@
+# client requests in the last 12s:
+$ kubectl logs deploy/inventory-client --since=12s | grep -o 'served_by=[^ ]*' | sort | uniq -c
+  12 served_by=inventory-6dbd759cb7-wdvdf
+
+# requests the unready pod (inventory-6dbd759cb7-lczrv) itself logged in the last 12s:
+$ kubectl logs inventory-6dbd759cb7-lczrv --since=12s | grep -c 'GET /items'
+0
+
+$ kubectl logs deploy/inventory-client --tail=6
+06:01:54 req#0061 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:01:55 req#0062 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:01:56 req#0063 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:01:57 req#0064 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:01:58 req#0065 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:01:59 req#0066 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+

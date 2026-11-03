@@ -1,0 +1,27 @@
+$ kubectl logs deploy/inventory-client --tail=12
+06:01:22 req#0029 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:01:23 req#0030 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:01:24 req#0031 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:01:25 req#0032 OK  served_by=inventory-6dbd759cb7-lczrv ip=10.244.0.7
+06:01:26 req#0033 OK  served_by=inventory-6dbd759cb7-lczrv ip=10.244.0.7
+06:01:27 req#0034 OK  served_by=inventory-6dbd759cb7-lczrv ip=10.244.0.7
+06:01:28 req#0035 OK  served_by=inventory-6dbd759cb7-lczrv ip=10.244.0.7
+06:01:29 req#0036 OK  served_by=inventory-6dbd759cb7-lczrv ip=10.244.0.7
+06:01:30 req#0037 OK  served_by=inventory-6dbd759cb7-lczrv ip=10.244.0.7
+06:01:31 req#0038 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:01:32 req#0039 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:01:33 req#0040 OK  served_by=inventory-6dbd759cb7-lczrv ip=10.244.0.7
+
+# which pod answered each of the client's requests in the last 30s:
+$ kubectl logs deploy/inventory-client --since=30s | grep -o 'served_by=[^ ]*' | sort | uniq -c
+  15 served_by=inventory-6dbd759cb7-lczrv
+  15 served_by=inventory-6dbd759cb7-wdvdf
+
+$ kubectl logs pod/inventory-6dbd759cb7-lczrv --tail=2
+[inventory-6dbd759cb7-lczrv] 10.244.0.5 "GET /items HTTP/1.1" 200 -
+[inventory-6dbd759cb7-lczrv] 10.244.0.5 "GET /items HTTP/1.1" 200 -
+
+$ kubectl logs pod/inventory-6dbd759cb7-wdvdf --tail=2
+[inventory-6dbd759cb7-wdvdf] 10.244.0.5 "GET /items HTTP/1.1" 200 -
+[inventory-6dbd759cb7-wdvdf] 10.244.0.5 "GET /items HTTP/1.1" 200 -
+

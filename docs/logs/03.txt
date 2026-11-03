@@ -1,0 +1,24 @@
+$ kubectl apply -f k8s/
+deployment.apps/inventory-client created
+deployment.apps/inventory created
+service/inventory-service created
+
+$ kubectl rollout status deployment/inventory
+Waiting for deployment "inventory" rollout to finish: 0 of 2 updated replicas are available...
+Waiting for deployment "inventory" rollout to finish: 1 of 2 updated replicas are available...
+deployment "inventory" successfully rolled out
+
+$ kubectl rollout status deployment/inventory-client
+deployment "inventory-client" successfully rolled out
+
+$ kubectl get deployments
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+inventory          2/2     2            2           3s
+inventory-client   1/1     1            1           3s
+
+$ kubectl get pods -o wide
+NAME                                READY   STATUS    RESTARTS   AGE   IP           NODE                    NOMINATED NODE   READINESS GATES
+inventory-6dbd759cb7-lczrv          1/1     Running   0          3s    10.244.0.7   module6-control-plane   <none>           <none>
+inventory-6dbd759cb7-wdvdf          1/1     Running   0          3s    10.244.0.6   module6-control-plane   <none>           <none>
+inventory-client-67b6c65595-26jd4   1/1     Running   0          3s    10.244.0.5   module6-control-plane   <none>           <none>
+

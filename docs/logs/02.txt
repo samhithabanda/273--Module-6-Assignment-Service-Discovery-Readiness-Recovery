@@ -1,0 +1,14 @@
+$ docker build -q -t inventory-service:1.0 app
+sha256:a5e501444e7615041ff7dea4702c3d8f261238f0d98a4562af0833021b3b1fbc
+
+$ docker build -q -t inventory-client:1.0 client
+sha256:1b0e1d1366baf2250f69b153874f0673d2844043321b0e8e570dac3b8fbca8c5
+
+$ docker images | grep -E 'REPOSITORY|inventory'
+inventory-client:1.0                                                                   1b0e1d1366ba        203MB         43.6MB        
+inventory-service:1.0                                                                  a5e501444e76        203MB         43.6MB        
+
+$ kind load docker-image inventory-service:1.0 inventory-client:1.0 --name module6
+Image: "inventory-service:1.0" with ID "sha256:a5e501444e7615041ff7dea4702c3d8f261238f0d98a4562af0833021b3b1fbc" not yet present on node "module6-control-plane", loading...
+Image: "inventory-client:1.0" with ID "sha256:1b0e1d1366baf2250f69b153874f0673d2844043321b0e8e570dac3b8fbca8c5" not yet present on node "module6-control-plane", loading...
+

@@ -1,0 +1,13 @@
+$ kind get clusters
+module6
+
+$ kubectl get nodes -o wide
+NAME                    STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION    CONTAINER-RUNTIME
+module6-control-plane   Ready    control-plane   25s   v1.32.2   172.19.0.2    <none>        Debian GNU/Linux 12 (bookworm)   7.0.14-linuxkit   containerd://2.0.2
+
+$ kubectl cluster-info
+Kubernetes control plane is running at https://127.0.0.1:60375
+CoreDNS is running at https://127.0.0.1:60375/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+

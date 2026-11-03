@@ -1,0 +1,17 @@
+# client requests since readiness was restored:
+$ kubectl logs deploy/inventory-client --since-time=2026-11-03T06:02:06Z | grep -o 'served_by=[^ ]*' | sort | uniq -c
+  10 served_by=inventory-6dbd759cb7-lczrv
+  10 served_by=inventory-6dbd759cb7-wdvdf
+
+# first request the restored pod answered:
+$ kubectl logs deploy/inventory-client --since-time=2026-11-03T06:02:06Z | grep -m1 inventory-6dbd759cb7-lczrv
+06:02:08 req#0075 OK  served_by=inventory-6dbd759cb7-lczrv ip=10.244.0.7
+
+$ kubectl logs deploy/inventory-client --tail=6
+06:02:20 req#0087 OK  served_by=inventory-6dbd759cb7-lczrv ip=10.244.0.7
+06:02:21 req#0088 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:02:22 req#0089 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:02:23 req#0090 OK  served_by=inventory-6dbd759cb7-lczrv ip=10.244.0.7
+06:02:24 req#0091 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:02:25 req#0092 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+

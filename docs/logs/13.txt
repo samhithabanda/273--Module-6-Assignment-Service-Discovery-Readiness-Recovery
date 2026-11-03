@@ -1,0 +1,13 @@
+$ kubectl get service inventory-service -o wide
+NAME                TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE   SELECTOR
+inventory-service   ClusterIP   10.96.217.83   <none>        8080/TCP   96s   app=inventory
+
+$ kubectl get pods -l app=inventory -o wide
+NAME                         READY   STATUS    RESTARTS   AGE   IP           NODE                    NOMINATED NODE   READINESS GATES
+inventory-6dbd759cb7-lczrv   1/1     Running   0          96s   10.244.0.7   module6-control-plane   <none>           <none>
+inventory-6dbd759cb7-wdvdf   1/1     Running   0          96s   10.244.0.6   module6-control-plane   <none>           <none>
+
+$ kubectl get endpoints inventory-service
+NAME                ENDPOINTS                         AGE
+inventory-service   10.244.0.6:8080,10.244.0.7:8080   96s
+

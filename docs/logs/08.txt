@@ -1,0 +1,6 @@
+$ kubectl describe pod inventory-6dbd759cb7-lczrv | grep -E '^ *Ready|Readiness:|Unhealthy'
+    Ready:          False
+    Readiness:      http-get http://:8080/ready delay=2s timeout=1s period=2s #success=1 #failure=1
+  Ready                       False 
+  Warning  Unhealthy  1s (x5 over 7s)  kubelet            spec.containers{inventory}: Readiness probe failed: HTTP probe failed with statuscode: 503
+

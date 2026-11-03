@@ -1,0 +1,17 @@
+$ kubectl get service inventory-service
+NAME                TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+inventory-service   ClusterIP   10.96.217.83   <none>        8080/TCP   5s
+
+$ kubectl get endpoints inventory-service
+NAME                ENDPOINTS                         AGE
+inventory-service   10.244.0.6:8080,10.244.0.7:8080   5s
+
+$ kubectl describe service inventory-service | grep -E 'Name:|Selector|Type:|^IP:|Port:|Endpoints'
+Name:                     inventory-service
+Selector:                 app=inventory
+Type:                     ClusterIP
+IP:                       10.96.217.83
+Port:                     <unset>  8080/TCP
+TargetPort:               8080/TCP
+Endpoints:                10.244.0.7:8080,10.244.0.6:8080
+

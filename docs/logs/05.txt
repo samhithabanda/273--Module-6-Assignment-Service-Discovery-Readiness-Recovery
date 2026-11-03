@@ -1,0 +1,13 @@
+$ grep -n 'inventory-service' client/client.py k8s/client-deployment.yaml
+client/client.py:12:URL = os.environ.get("INVENTORY_URL", "http://inventory-service:8080/items")
+k8s/client-deployment.yaml:23:              value: http://inventory-service:8080/items
+
+$ kubectl exec inventory-client-67b6c65595-26jd4 -- printenv INVENTORY_URL
+http://inventory-service:8080/items
+
+$ kubectl exec inventory-client-67b6c65595-26jd4 -- python -c "import socket; print(socket.gethostbyname('inventory-service'))"
+10.96.217.83
+
+$ kubectl exec inventory-client-67b6c65595-26jd4 -- python -c "import urllib.request; print(urllib.request.urlopen('http://inventory-service:8080/items').read().decode())" | cut -c1-110
+{"served_by": "inventory-6dbd759cb7-wdvdf", "pod_ip": "10.244.0.6", "time": "2026-11-03T06:01:01+00:00", "item
+

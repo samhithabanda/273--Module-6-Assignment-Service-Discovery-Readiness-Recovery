@@ -1,0 +1,29 @@
+$ kubectl get deployment inventory
+NAME        READY   UP-TO-DATE   AVAILABLE   AGE
+inventory   2/2     2            2           2m21s
+
+$ kubectl get pods -l app=inventory -o wide
+NAME                         READY   STATUS    RESTARTS   AGE     IP           NODE                    NOMINATED NODE   READINESS GATES
+inventory-6dbd759cb7-tlq4g   1/1     Running   0          42s     10.244.0.8   module6-control-plane   <none>           <none>
+inventory-6dbd759cb7-wdvdf   1/1     Running   0          2m21s   10.244.0.6   module6-control-plane   <none>           <none>
+
+$ kubectl get service inventory-service
+NAME                TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+inventory-service   ClusterIP   10.96.217.83   <none>        8080/TCP   2m21s
+
+$ kubectl get endpoints inventory-service
+NAME                ENDPOINTS                         AGE
+inventory-service   10.244.0.6:8080,10.244.0.8:8080   2m21s
+
+# before vs after
+               BEFORE                         AFTER
+  pod name     inventory-6dbd759cb7-lczrv     inventory-6dbd759cb7-tlq4g
+  pod IP       10.244.0.7                     10.244.0.8
+  service      inventory-service              inventory-service
+  cluster IP   10.96.217.83                   (same)
+
+$ kubectl get events --sort-by=.lastTimestamp | grep -E 'Killing|SuccessfulCreate' | tail -3
+2m21s       Normal    SuccessfulCreate          replicaset/inventory-6dbd759cb7          Created pod: inventory-6dbd759cb7-lczrv
+42s         Normal    Killing                   pod/inventory-6dbd759cb7-lczrv           Stopping container inventory
+42s         Normal    SuccessfulCreate          replicaset/inventory-6dbd759cb7          Created pod: inventory-6dbd759cb7-tlq4g
+

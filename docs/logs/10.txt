@@ -1,0 +1,12 @@
+$ kubectl get pod inventory-6dbd759cb7-lczrv -o custom-columns=NAME:.metadata.name,PHASE:.status.phase,READY:.status.containerStatuses[0].ready,RESTARTS:.status.containerStatuses[0].restartCount
+NAME                         PHASE     READY   RESTARTS
+inventory-6dbd759cb7-lczrv   Running   false   0
+
+$ kubectl exec inventory-6dbd759cb7-lczrv -- python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8080/healthz').read().decode())"
+{"status": "alive", "pod": "inventory-6dbd759cb7-lczrv"}
+
+$ kubectl exec inventory-6dbd759cb7-lczrv -- python -c "import urllib.request as u
+try: u.urlopen('http://localhost:8080/ready')
+except Exception as e: print(e)"
+HTTP Error 503: Service Unavailable
+

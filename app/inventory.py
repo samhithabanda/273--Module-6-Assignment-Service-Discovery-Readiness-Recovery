@@ -7,7 +7,9 @@ Endpoints
 """
 import json
 import os
+import signal
 import socket
+import sys
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -54,5 +56,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
+    # Exit cleanly when Kubernetes stops the Pod (otherwise it waits 30s and SIGKILLs us).
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
     print(f"Inventory Service starting on :{PORT} as {POD_NAME} ({POD_IP})", flush=True)
     ThreadingHTTPServer(("", PORT), Handler).serve_forever()

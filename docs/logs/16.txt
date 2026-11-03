@@ -1,0 +1,23 @@
+# client requests since the pod was deleted:
+$ kubectl logs deploy/inventory-client --since-time=2026-11-03T06:02:32Z | grep -o 'served_by=[^ ]*' | sort | uniq -c
+  14 served_by=inventory-6dbd759cb7-tlq4g
+  31 served_by=inventory-6dbd759cb7-wdvdf
+
+# failed requests since the pod was deleted:
+$ kubectl logs deploy/inventory-client --since-time=2026-11-03T06:02:32Z | grep -c ERR
+0
+
+# first request answered by the new pod:
+$ kubectl logs deploy/inventory-client --since-time=2026-11-03T06:02:32Z | grep -m1 inventory-6dbd759cb7-tlq4g
+06:02:39 req#0106 OK  served_by=inventory-6dbd759cb7-tlq4g ip=10.244.0.8
+
+$ kubectl logs deploy/inventory-client --tail=8
+06:03:10 req#0136 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:03:11 req#0137 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:03:12 req#0138 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:03:13 req#0139 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:03:14 req#0140 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:03:15 req#0141 OK  served_by=inventory-6dbd759cb7-tlq4g ip=10.244.0.8
+06:03:16 req#0142 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+06:03:17 req#0143 OK  served_by=inventory-6dbd759cb7-wdvdf ip=10.244.0.6
+
