@@ -1,0 +1,63 @@
+$ kubectl get service inventory-service -o wide
+NAME                TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE    SELECTOR
+inventory-service   ClusterIP   10.96.22.138   <none>        8080/TCP   3m2s   app=inventory
+
+$ kubectl get pods -l app=inventory -o wide
+NAME                         READY   STATUS    RESTARTS   AGE    IP           NODE                    NOMINATED NODE   READINESS GATES
+inventory-6dbd759cb7-qfth9   1/1     Running   0          3m2s   10.244.0.6   module6-control-plane   <none>           <none>
+inventory-6dbd759cb7-xv2lf   1/1     Running   0          93s    10.244.0.8   module6-control-plane   <none>           <none>
+
+$ kubectl delete pod inventory-6dbd759cb7-qfth9 --wait=false
+pod "inventory-6dbd759cb7-qfth9" deleted from default namespace
+
+$ kubectl get pods -l app=inventory -o wide
+NAME                         READY   STATUS        RESTARTS   AGE    IP           NODE                    NOMINATED NODE   READINESS GATES
+inventory-6dbd759cb7-8vwhk   0/1     Running       0          1s     10.244.0.9   module6-control-plane   <none>           <none>
+inventory-6dbd759cb7-qfth9   1/1     Terminating   0          3m3s   10.244.0.6   module6-control-plane   <none>           <none>
+inventory-6dbd759cb7-xv2lf   1/1     Running       0          94s    10.244.0.8   module6-control-plane   <none>           <none>
+
+$ kubectl get pods -l app=inventory -o wide
+NAME                         READY   STATUS    RESTARTS   AGE    IP           NODE                    NOMINATED NODE   READINESS GATES
+inventory-6dbd759cb7-8vwhk   1/1     Running   0          31s    10.244.0.9   module6-control-plane   <none>           <none>
+inventory-6dbd759cb7-xv2lf   1/1     Running   0          2m4s   10.244.0.8   module6-control-plane   <none>           <none>
+
+$ kubectl get service inventory-service -o wide
+NAME                TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE     SELECTOR
+inventory-service   ClusterIP   10.96.22.138   <none>        8080/TCP   3m33s   app=inventory
+
+$ kubectl get endpoints inventory-service
+NAME                ENDPOINTS                         AGE
+inventory-service   10.244.0.8:8080,10.244.0.9:8080   3m33s
+
+$ kubectl get events --sort-by=.lastTimestamp | grep -E 'Killing|SuccessfulCreate|Scheduled|Started' | tail -8
+2m4s        Normal    Started                   pod/inventory-6dbd759cb7-xv2lf           Started container inventory
+2m4s        Normal    SuccessfulCreate          replicaset/inventory-6dbd759cb7          Created pod: inventory-6dbd759cb7-xv2lf
+2m4s        Normal    Scheduled                 pod/inventory-6dbd759cb7-xv2lf           Successfully assigned default/inventory-6dbd759cb7-xv2lf to module6-control-plane
+2m4s        Normal    Killing                   pod/inventory-6dbd759cb7-ldq7p           Stopping container inventory
+31s         Normal    SuccessfulCreate          replicaset/inventory-6dbd759cb7          Created pod: inventory-6dbd759cb7-8vwhk
+31s         Normal    Scheduled                 pod/inventory-6dbd759cb7-8vwhk           Successfully assigned default/inventory-6dbd759cb7-8vwhk to module6-control-plane
+31s         Normal    Killing                   pod/inventory-6dbd759cb7-qfth9           Stopping container inventory
+30s         Normal    Started                   pod/inventory-6dbd759cb7-8vwhk           Started container inventory
+
+# Deleted Pod: inventory-6dbd759cb7-qfth9   Replacement Pod: inventory-6dbd759cb7-8vwhk
+# Client traffic over the last 15 seconds (served by inventory-6dbd759cb7-xv2lf and the new inventory-6dbd759cb7-8vwhk):
+$ tally 15
+   6 served_by=inventory-6dbd759cb7-8vwhk
+   9 served_by=inventory-6dbd759cb7-xv2lf
+
+# Failed client requests during the whole delete/replace window (60s):
+$ kubectl logs inventory-client-67b6c65595-272gb --since=60s | grep -c ERR || true
+0
+
+$ kubectl logs inventory-client-67b6c65595-272gb --tail=10
+05:11:51 req#0218 OK  served_by=inventory-6dbd759cb7-8vwhk ip=10.244.0.9
+05:11:52 req#0219 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:11:53 req#0220 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:11:54 req#0221 OK  served_by=inventory-6dbd759cb7-8vwhk ip=10.244.0.9
+05:11:55 req#0222 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:11:56 req#0223 OK  served_by=inventory-6dbd759cb7-8vwhk ip=10.244.0.9
+05:11:57 req#0224 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:11:58 req#0225 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:11:59 req#0226 OK  served_by=inventory-6dbd759cb7-8vwhk ip=10.244.0.9
+05:12:00 req#0227 OK  served_by=inventory-6dbd759cb7-8vwhk ip=10.244.0.9
+

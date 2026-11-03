@@ -1,0 +1,37 @@
+# Pod to make unready: inventory-6dbd759cb7-qfth9   (other Pod: inventory-6dbd759cb7-xv2lf)
+$ kubectl exec inventory-6dbd759cb7-qfth9 -- touch /tmp/not-ready
+
+$ kubectl get pods -l app=inventory -o wide
+NAME                         READY   STATUS    RESTARTS   AGE     IP           NODE                    NOMINATED NODE   READINESS GATES
+inventory-6dbd759cb7-qfth9   0/1     Running   0          2m25s   10.244.0.6   module6-control-plane   <none>           <none>
+inventory-6dbd759cb7-xv2lf   1/1     Running   0          56s     10.244.0.8   module6-control-plane   <none>           <none>
+
+$ kubectl get endpoints inventory-service
+NAME                ENDPOINTS         AGE
+inventory-service   10.244.0.8:8080   2m25s
+
+$ kubectl describe pod inventory-6dbd759cb7-qfth9 | grep -E 'Ready|Readiness|Unhealthy' 
+    Ready:          False
+    Readiness:      http-get http://:8080/ready delay=2s timeout=1s period=2s #success=1 #failure=1
+  PodReadyToStartContainers   True 
+  Ready                       False 
+  ContainersReady             False 
+  Warning  Unhealthy  1s (x4 over 5s)  kubelet            spec.containers{inventory}: Readiness probe failed: HTTP probe failed with statuscode: 503
+
+$ kubectl get pod inventory-6dbd759cb7-qfth9 -o jsonpath='{.status.phase}{"  restarts="}{.status.containerStatuses[0].restartCount}{"\n"}'
+Running  restarts=0
+
+# Client traffic over the last 15 seconds (only the ready Pod should appear):
+$ tally 15
+  15 served_by=inventory-6dbd759cb7-xv2lf
+
+$ kubectl logs inventory-client-67b6c65595-272gb --tail=8
+05:10:45 req#0152 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:46 req#0153 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:47 req#0154 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:48 req#0155 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:49 req#0156 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:50 req#0157 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:51 req#0158 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:52 req#0159 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+

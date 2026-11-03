@@ -1,0 +1,37 @@
+$ kubectl logs inventory-client-67b6c65595-272gb --tail=20
+05:10:12 req#0119 OK  served_by=inventory-6dbd759cb7-qfth9 ip=10.244.0.6
+05:10:13 req#0120 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:14 req#0121 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:15 req#0122 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:16 req#0123 OK  served_by=inventory-6dbd759cb7-qfth9 ip=10.244.0.6
+05:10:17 req#0124 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:18 req#0125 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:19 req#0126 OK  served_by=inventory-6dbd759cb7-qfth9 ip=10.244.0.6
+05:10:20 req#0127 OK  served_by=inventory-6dbd759cb7-qfth9 ip=10.244.0.6
+05:10:21 req#0128 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:22 req#0129 OK  served_by=inventory-6dbd759cb7-qfth9 ip=10.244.0.6
+05:10:23 req#0130 OK  served_by=inventory-6dbd759cb7-qfth9 ip=10.244.0.6
+05:10:24 req#0131 OK  served_by=inventory-6dbd759cb7-qfth9 ip=10.244.0.6
+05:10:25 req#0132 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:26 req#0133 OK  served_by=inventory-6dbd759cb7-qfth9 ip=10.244.0.6
+05:10:27 req#0134 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:28 req#0135 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:29 req#0136 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:10:30 req#0137 OK  served_by=inventory-6dbd759cb7-qfth9 ip=10.244.0.6
+05:10:31 req#0138 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+
+# Requests per replica over the last 20 seconds:
+$ tally 20
+   9 served_by=inventory-6dbd759cb7-qfth9
+  11 served_by=inventory-6dbd759cb7-xv2lf
+
+$ kubectl logs pod/inventory-6dbd759cb7-qfth9 --tail=3
+[inventory-6dbd759cb7-qfth9] 10.244.0.5 "GET /items HTTP/1.1" 200 -
+[inventory-6dbd759cb7-qfth9] 10.244.0.5 "GET /items HTTP/1.1" 200 -
+[inventory-6dbd759cb7-qfth9] 10.244.0.5 "GET /items HTTP/1.1" 200 -
+
+$ kubectl logs pod/inventory-6dbd759cb7-xv2lf --tail=3
+[inventory-6dbd759cb7-xv2lf] 10.244.0.5 "GET /items HTTP/1.1" 200 -
+[inventory-6dbd759cb7-xv2lf] 10.244.0.5 "GET /items HTTP/1.1" 200 -
+[inventory-6dbd759cb7-xv2lf] 10.244.0.5 "GET /items HTTP/1.1" 200 -
+

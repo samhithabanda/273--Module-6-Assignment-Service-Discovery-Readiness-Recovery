@@ -1,0 +1,26 @@
+$ kubectl exec inventory-6dbd759cb7-qfth9 -- rm /tmp/not-ready
+
+$ kubectl get pods -l app=inventory -o wide
+NAME                         READY   STATUS    RESTARTS   AGE     IP           NODE                    NOMINATED NODE   READINESS GATES
+inventory-6dbd759cb7-qfth9   1/1     Running   0          2m47s   10.244.0.6   module6-control-plane   <none>           <none>
+inventory-6dbd759cb7-xv2lf   1/1     Running   0          78s     10.244.0.8   module6-control-plane   <none>           <none>
+
+$ kubectl get endpoints inventory-service
+NAME                ENDPOINTS                         AGE
+inventory-service   10.244.0.6:8080,10.244.0.8:8080   2m47s
+
+# Client traffic over the last 15 seconds (both Pods again):
+$ tally 15
+   8 served_by=inventory-6dbd759cb7-qfth9
+   6 served_by=inventory-6dbd759cb7-xv2lf
+
+$ kubectl logs inventory-client-67b6c65595-272gb --tail=8
+05:11:07 req#0174 OK  served_by=inventory-6dbd759cb7-qfth9 ip=10.244.0.6
+05:11:08 req#0175 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:11:09 req#0176 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:11:10 req#0177 OK  served_by=inventory-6dbd759cb7-qfth9 ip=10.244.0.6
+05:11:11 req#0178 OK  served_by=inventory-6dbd759cb7-qfth9 ip=10.244.0.6
+05:11:12 req#0179 OK  served_by=inventory-6dbd759cb7-qfth9 ip=10.244.0.6
+05:11:13 req#0180 OK  served_by=inventory-6dbd759cb7-xv2lf ip=10.244.0.8
+05:11:14 req#0181 OK  served_by=inventory-6dbd759cb7-qfth9 ip=10.244.0.6
+
